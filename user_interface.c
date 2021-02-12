@@ -55,6 +55,7 @@ int main(int argc, char* argv[])
     if (argc == 1)
     {
         welcomeMsg();
+        getInput(start);
     }
     else if (argc == 2)
     {
@@ -64,6 +65,7 @@ int main(int argc, char* argv[])
             printf("\n\n\n*************************DEBUG MODE");
             printf("*************************\n\n\n");
             welcomeMsg();
+            getInput(start);
         }
         else
         {
@@ -98,7 +100,6 @@ void  welcomeMsg()
     printf("3. [F]ind Record: [find]\n");
     printf("4. [D]elete Record: [delete]\n");
     printf("5. [Q]uit: [quit]\n");
-    getInput();
 }
 
 /*****************************************************************
@@ -115,7 +116,7 @@ void  welcomeMsg()
 //
 ****************************************************************/
 
-void getInput()
+void getInput(struct record * start)
 {
     char user_input[10];
     int runLoop;
@@ -132,7 +133,7 @@ void getInput()
     {
         fgets(user_input, 9, stdin);
         length = strlen(user_input) - 1;
- 
+
         if (strncmp(user_input, "quit", length) == 0 ||
             strncmp(user_input, "QUIT", length) == 0 ||
             strcmp(user_input, "5\n") == 0)
@@ -146,7 +147,7 @@ void getInput()
         {
             printf("Add A Record...\n");
             runLoop = 0;
-            add();
+            add(start);
         }
         else if (strncmp(user_input, "printall", length) == 0 ||
             strncmp(user_input, "PRINTALL", length) == 0 ||
@@ -154,7 +155,7 @@ void getInput()
         {
             printf("Printing All Records...\n");
             runLoop = 0;
-            print();
+            print(start);
         }
         else if (strncmp(user_input, "find", length) == 0 ||
             strncmp(user_input, "FIND", length) == 0 ||
@@ -162,7 +163,7 @@ void getInput()
         {
             printf("Find A Record...\n");
             runLoop = 0;
-            find();
+            find(start);
         }
         else if (strncmp(user_input, "delete", length) == 0 ||
             strncmp(user_input, "Delete", length) == 0 ||
@@ -170,7 +171,7 @@ void getInput()
         {
             printf("Delete A Record...\n");
             runLoop = 0;
-            delete();
+            delete(start);
         }
         else
         {
@@ -191,38 +192,37 @@ void getInput()
 //
 ****************************************************************/
 
-void add()
+void add(struct record * start)
 {
     int accountno;
     int runLoop;
     char name[25];
-    
+
     if (debugmode == 1)
     {
         printf("\n\n****Running add() in debug mode****\n\n");
     }
-    
+
     printf("\nEnter The Account Number you wish to add : ");
-    
+
     accountno = enterAccount();
-    
+
     printf("\nEnter The Account holder's name you wish to add : ");
-    
     runLoop = 1;
-    
+
     while (runLoop == 1)
-    {    
+    {
         fgets(name, 24, stdin);
         printf("Input Accepted\n");
         runLoop = 0;
     }
-    
+
     if (debugmode == 1)
     {
         printf("\n****Account holder name is %s****\n", name);
     }
-    
-    getAddress(name, accountno);
+
+    getAddress(name, accountno, start);
 }
 
 /*****************************************************************
@@ -237,13 +237,13 @@ void add()
 //
 ****************************************************************/
 
-void print()
+void print(struct record * start)
 {
     if (debugmode == 1)
     {
         printf("\n\n****Running print() in debug mode****\n\n");
     }
-    printAllRecords();
+    printAllRecords(start);
 }
 
 /*****************************************************************
@@ -258,27 +258,26 @@ void print()
 //
 ****************************************************************/
 
-void find()
+void find(struct record * start)
 {
     int accountno;
-    struct record recordEntry;
-    
+
     if (debugmode == 1)
     {
         printf("\n\n****Running find() in debug mode****\n\n");
     }
-    
+
     printf("\nEnter The Account Number you wish to find : ");
-    
+
     accountno = enterAccount();
-    
+
     if (debugmode == 1)
     {
         printf("\n\n****Running find() in debug mode****\n\n");
         printf("\n****Account number is %d****\n", accountno);
     }
-    
-    findRecord(&recordEntry, accountno);
+
+    findRecord(&start, accountno);
 }
 
 /*****************************************************************
@@ -293,26 +292,25 @@ void find()
 //
 ****************************************************************/
 
-void delete()
+void delete(struct record * start)
 {
     int accountno;
-    struct record recordEntry;
-    
+
     if (debugmode == 1)
     {
         printf("\n\n****Running delete() in debug mode****\n\n");
     }
-    
+
     printf("\nEnter The Account Number you wish to delete : ");
-    
+
     accountno = enterAccount();
-    
+
     if (debugmode == 1)
     {
         printf("\n\n****Running delete() in debug mode****\n\n");
         printf("\n****Account number is %d****\n", accountno);
     }
-    deleteRecord(&recordEntry, accountno);
+    deleteRecord(&start, accountno);
 }
 
 /*****************************************************************
@@ -333,15 +331,15 @@ int enterAccount()
     int accountno;
     char user_input[100];
     int runLoop;
-    
+
     if (debugmode == 1)
     {
         printf("\n\n****Running enterAccount() in debug mode****\n\n");
     }
     runLoop = 1;
-    
+
     while (runLoop == 1)
-    {    
+    {
         fgets(user_input, 99, stdin);
 
         if ( sscanf(user_input, "%d", &accountno) != 1)
@@ -360,45 +358,58 @@ int enterAccount()
             runLoop = 0;
         }
     }
-    
-return accountno;
+    return accountno;
 }
 
+/*****************************************************************
+//
+//  Function name: getAddress
+//
+//  DESCRIPTION:   Gets the user address
+//
+//  Parameters:    index (int) the space in array to work with
+//                 run (int) boolean used to run the loop.
+//                 c (char) the user input
+//                 address[50] the address
+//                 recordEntry (record) struct of the record
+//
+//  Return values:  none
+//
+****************************************************************/
 
-void getAddress(char name[], int accountno)
+void getAddress(char name[], int accountno, struct record * start)
 {
     int index;
     int run;
     char c;
     char address[50];
-    struct record recordEntry;
 
     run = 1;
     index = 0;
-    
-    if(debugmode == 1)
+
+    if (debugmode == 1)
     {
         printf("\n\n****Running getAddress() in debug mode****\n");
-        printf("****name is: %s****\n", name);
+        printf("****name is: %s", name);
         printf("****accountno is: %d****\n", accountno);
     }
 
     printf("\nEnter address:\n");
     printf("Press [ENTER] twice to compelete entry.\n");
-    
-    while(run == 1)
+
+    while (run == 1)
     {
         c = getchar();
         address[index] = c;
         index++;
-        
-        if(c == 10)
+
+        if (c == 10)
         {
-            if(address[index - 2] == 10)
+            if (address[index - 2] == 10)
             {
                 address[index - 2] = '\0';
                 printf("Input Accepted\n");
-                
+
                 if (debugmode == 1)
                 {
                     printf("\n********DEBUG MODE********\n");
@@ -409,7 +420,6 @@ void getAddress(char name[], int accountno)
             }
         }
     }
-    
-    addRecord(&recordEntry, accountno, name, address);
-}
 
+    addRecord(&start, accountno, name, address);
+}

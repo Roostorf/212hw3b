@@ -47,7 +47,6 @@ int addRecord(struct record **recordEntry, int accountno, char name[], char addr
         printf("\n****Account holder address is****\n\n%s\n", address);
         printf("\n**************************\n");
     }
-    
     return 0;
 }
 
@@ -87,14 +86,12 @@ void printAllRecords(struct record *recordEntry)
 
 int findRecord(struct record *recordEntry, int accountno)
 {
-    
     if (debugmode == 1)
     {
         printf("\n****Running findRecord() in debug mode****\n");
         printf("\n****findRecord() was called****\n");
         printf("\n****Account number to find is %d****\n", accountno);
     }
-    
     return 0;
 }
 
